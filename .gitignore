@@ -3,3 +3,10 @@
 .cursorignore
 /tmp/
 AGENTS.md
+
+# build outputs
+/dist/
+
+# local env
+.venv/
+node_modules/

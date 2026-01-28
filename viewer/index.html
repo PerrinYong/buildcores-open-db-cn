@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpenDB Product Facts Viewer</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="wrap">
+      <header class="hdr">
+        <h1>OpenDB Product Facts</h1>
+        <p class="sub">
+          Load from <code>dist/product_facts/index.json</code>. Run the build script first.
+        </p>
+      </header>
+
+      <section class="controls">
+        <input id="q" type="search" placeholder="Search name / manufacturer / id / category..." />
+        <select id="cat">
+          <option value="">All categories</option>
+        </select>
+        <span id="meta" class="meta"></span>
+      </section>
+
+      <section class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Name</th>
+              <th>Manufacturer</th>
+              <th>OpenDB ID</th>
+              <th>File</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
