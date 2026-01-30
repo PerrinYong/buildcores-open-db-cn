@@ -29,7 +29,8 @@
     "manufacturer": "ASUS",
     "part_numbers": [
       "TUF GAMING B760-PLUS WIFI                                                    90MB1ER0-M0AAY0                                                    90MB1ER0-M0EAY0                                                    90MB1ER0-M1EAY0",
-      "TUF GAMING B760-PLUS WIFI"
+      "TUF GAMING B760-PLUS WIFI",
+      "90MB1ER0-M1EAY0"
     ],
     "series": "B760",
     "variant": ""
@@ -112,7 +113,7 @@
   ],
   "general_product_information": {
     "amazon_sku": "B0BZT9KYNB",
-    "newegg_sku": "N82E16813119641",
+    "newegg_sku": "N82E16813119641R",
     "walmart_sku": 1360642726
   }
 }
