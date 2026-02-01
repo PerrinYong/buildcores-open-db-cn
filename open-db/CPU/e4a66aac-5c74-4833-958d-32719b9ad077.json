@@ -41,13 +41,16 @@
     "manufacturer": "AMD",
     "series": "AMD Ryzen 7",
     "releaseYear": 2026,
-    "part_numbers": []
+    "part_numbers": [
+      "100-100001973WOF"
+    ]
   },
   "series": "AMD Ryzen 7",
   "microarchitecture": "Zen 5",
   "coreFamily": "Granite Ridge",
   "socket": "AM5",
   "general_product_information": {
-    "amazon_sku": "B0G8JMLXNQ"
+    "amazon_sku": "B0G8JMLXNQ",
+    "bestbuy_sku": 6669037
   }
 }
