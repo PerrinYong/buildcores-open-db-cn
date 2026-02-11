@@ -1,0 +1,3 @@
+[submodule "open-db-upstream"]
+	path = open-db-upstream
+	url = https://github.com/buildcores/buildcores-open-db.git

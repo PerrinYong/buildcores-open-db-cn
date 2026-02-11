@@ -1,48 +1,38 @@
-name: Sync upstream OpenDB
+name: Sync Nested Upstream Submodule
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "23 2 * * *"  # daily
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 permissions:
-  contents: write
-
-concurrency:
-  group: sync-upstream
-  cancel-in-progress: false
+  contents: read
 
 jobs:
-  sync:
+  validate-submodule:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
-      - name: Configure git identity
+      - name: Ensure nested upstream submodule exists
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          test -f .gitmodules
+          grep -q "submodule \"open-db-upstream\"" .gitmodules
 
-      - name: Add upstream remote
+      - name: Sync and update nested submodule
         run: |
-          git remote add upstream https://github.com/buildcores/buildcores-open-db.git || true
-          git remote -v
+          git submodule sync -- open-db-upstream
+          git submodule update --init --recursive open-db-upstream
 
-      - name: Fetch upstream
+      - name: Verify expected upstream data path
         run: |
-          git fetch upstream --prune
-
-      - name: Merge upstream/main
-        run: |
-          git checkout main
-          git merge --no-edit upstream/main || {
-            echo "Merge conflict. Resolve manually." >&2
-            exit 1
-          }
-
-      - name: Push
-        run: |
-          git push origin main
+          test -d open-db-upstream/open-db
+          echo "Nested upstream submodule is ready."
