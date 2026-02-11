@@ -8,7 +8,6 @@ from typing import Any, Dict, List, Tuple
 REPO_ROOT = Path(__file__).resolve().parents[1]
 UPSTREAM_OPEN_DB_DIR = REPO_ROOT / "open-db-upstream" / "open-db"
 CN_OPEN_DB_DIR = REPO_ROOT / "open-db-cn"
-LEGACY_OPEN_DB_DIR = REPO_ROOT / "open-db"
 OUT_DIR = REPO_ROOT / "dist" / "product_facts"
 
 
@@ -52,13 +51,10 @@ def build_index() -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
         source_dirs.append(("cn", CN_OPEN_DB_DIR))
 
     if not source_dirs:
-        if LEGACY_OPEN_DB_DIR.exists():
-            source_dirs.append(("legacy", LEGACY_OPEN_DB_DIR))
-        else:
-            raise RuntimeError(
-                "Missing source directories. Expected one of: "
-                f"{UPSTREAM_OPEN_DB_DIR}, {CN_OPEN_DB_DIR}, {LEGACY_OPEN_DB_DIR}"
-            )
+        raise RuntimeError(
+            "Missing source directories. Expected one of: "
+            f"{UPSTREAM_OPEN_DB_DIR}, {CN_OPEN_DB_DIR}"
+        )
 
     records: List[Dict[str, Any]] = []
     by_category: Dict[str, int] = {}

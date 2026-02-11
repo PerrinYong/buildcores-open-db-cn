@@ -11,7 +11,12 @@ cd buildcores-open-db-cn
 python tools/build_product_facts.py
 ```
 
-This scans all `open-db/*/*.json` files and generates:
+This scans:
+
+- `open-db-upstream/open-db/*/*.json`
+- `open-db-cn/*/*.json`
+
+and generates:
 - `dist/product_facts/index.json` (13MB) - Full product index
 - `dist/product_facts/index.csv` (8.6MB) - CSV export
 - `dist/product_facts/stats.json` (14KB) - Category/manufacturer statistics
@@ -69,7 +74,8 @@ Each record contains:
   "series": "Core i9",
   "variant": "13900K",
   "part_numbers": ["BX8071513900K"],
-  "path": "open-db/CPU/e0230286-0549-4da9-8115-9d1fbdcc2979.json"
+  "source_layer": "upstream",
+  "path": "open-db-upstream/open-db/CPU/e0230286-0549-4da9-8115-9d1fbdcc2979.json"
 }
 ```
 
@@ -77,9 +83,8 @@ Each record contains:
 
 ### Rebuild Index After Changes
 ```bash
-# Pull latest from upstream
-git fetch upstream
-git merge upstream/main
+# Pull latest upstream submodule pointer
+./scripts/sync_upstream.sh
 
 # Rebuild
 python tools/build_product_facts.py
@@ -88,10 +93,11 @@ python tools/build_product_facts.py
 ```
 
 ### Auto-sync Workflow
-A GitHub Actions workflow (`.github/workflows/sync-upstream.yml`) automatically:
-- Runs daily at 00:00 UTC
-- Merges changes from upstream (`buildcores/buildcores-open-db`)
-- Can be manually triggered via `gh workflow run sync-upstream.yml`
+A GitHub Actions workflow (`.github/workflows/sync-upstream.yml`) validates that:
+
+- nested submodule `open-db-upstream` is present
+- submodule can be initialized/updated
+- expected path `open-db-upstream/open-db` exists
 
 ## Use Cases
 
