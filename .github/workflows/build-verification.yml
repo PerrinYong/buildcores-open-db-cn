@@ -1,0 +1,102 @@
+name: Build Verification
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-product-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Verify submodule initialization
+        run: |
+          echo "Checking submodule status..."
+          git submodule status
+          test -d open-db-upstream/open-db || (echo "ERROR: Submodule not initialized" && exit 1)
+          echo "✓ Submodule initialized successfully"
+
+      - name: Run product facts build
+        run: |
+          echo "Running build_product_facts.py..."
+          python tools/build_product_facts.py
+          
+          echo ""
+          echo "Verifying build outputs..."
+          test -f dist/product_facts/index.json || (echo "ERROR: Missing index.json" && exit 1)
+          test -f dist/product_facts/index.csv || (echo "ERROR: Missing index.csv" && exit 1)
+          test -f dist/product_facts/stats.json || (echo "ERROR: Missing stats.json" && exit 1)
+          echo "✓ All output files present"
+
+      - name: Validate build statistics
+        run: |
+          echo "Validating build statistics..."
+          
+          # Extract total record count from stats
+          TOTAL=$(jq '.total' dist/product_facts/stats.json)
+          echo "Total records indexed: $TOTAL"
+          
+          # Verify minimum record count (should have substantial data)
+          if [ "$TOTAL" -lt 1000 ]; then
+            echo "ERROR: Expected at least 1000 records, got $TOTAL"
+            exit 1
+          fi
+          
+          # Check stats structure
+          jq '.by_source' dist/product_facts/stats.json
+          jq '.by_category | to_entries | length' dist/product_facts/stats.json | xargs echo "Categories indexed:"
+          echo "✓ Build statistics valid"
+
+      - name: Validate CSV structure
+        run: |
+          echo "Validating CSV structure..."
+          
+          # Check header row
+          HEADER=$(head -1 dist/product_facts/index.csv)
+          echo "CSV Header: $HEADER"
+          
+          # Count columns
+          COL_COUNT=$(echo "$HEADER" | awk -F',' '{print NF}')
+          echo "Columns: $COL_COUNT"
+          
+          # Check row count (should match total + 1 for header)
+          LINE_COUNT=$(wc -l < dist/product_facts/index.csv)
+          echo "Total lines (including header): $LINE_COUNT"
+          
+          # Basic sanity check
+          if [ "$COL_COUNT" -lt 8 ]; then
+            echo "ERROR: Expected at least 8 columns, got $COL_COUNT"
+            exit 1
+          fi
+          
+          echo "✓ CSV structure valid"
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: product-facts-index
+          path: dist/product_facts/
+          retention-days: 7
+
+      - name: Report build success
+        run: |
+          echo ""
+          echo "========================================="
+          echo "✓ Build verification PASSED"
+          echo "========================================="
+          echo "Build artifacts are ready at: dist/product_facts/"
